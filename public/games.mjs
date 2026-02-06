@@ -229,6 +229,7 @@ export const games = [
     { name: 'Pac-Man', url: 'pacman' },
     { name: 'Polytrack', url: 'polytrack' },
     { name: 'Pushback', url: 'pushback' },
+    { name: 'Poker', url: 'poker' },
     { name: 'Racer', url: 'racer' },
     { name: 'Radius Raid', url: 'radiusraid' },
     { name: 'Retro Bowl', url: 'retrobowl' },
