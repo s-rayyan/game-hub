@@ -149,6 +149,7 @@ export const games = [
     { name: 'Flash Tetris', url: 'flashtetris' },
     { name: 'Fleeing the Complex', url: 'fleeing-complex' },
     { name: 'FNAF', url: 'fnaf' },
+    { name: 'Five Nights at Epsteins', url: 'fnae' },
     { name: 'FNAW', url: 'fnaw' },
     { name: 'Football Brawl', url: 'football-brawl' },
     { name: 'Football Legends', url: 'football-legends' },
