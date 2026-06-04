@@ -265,6 +265,6 @@ export const games = [
     { name: 'Webretro', url: 'webretro' },
     { name: 'World\'s Hardest Game', url: 'worldshardestgame' },
     { name: 'World\'s Hardest Game 2', url: 'worldshardestgame2' },
-    { name: 'Yohoho IO', url: 'yohohoio' },
+    { name: 'Yohoho IO', url: 'yohohoio/yohohoio' },
     { name: 'xx142-b2.exe', url: 'xx142b2.exe' }
 ];
