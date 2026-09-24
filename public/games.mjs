@@ -250,6 +250,7 @@ export const games = [
     { name: 'Space Company', url: 'spacecompany' },
     { name: 'Space Invaders', url: 'spaceinvaders' },
     { name: 'Steal A Brainrot', url: 'steal-a-brainrot' },
+    { name: 'Subway Surfers', url: 'subway-surfers' },
     { name: 'Tetris', url: 'tetris' },
     { name: 'The Chroma Incident', url: 'thechromaincident' },
     { name: 'There Is No Game', url: 'thereisnogame' },
