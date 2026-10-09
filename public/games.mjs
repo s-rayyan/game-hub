@@ -227,6 +227,7 @@ export const games = [
     { name: 'Minecraft 1.5.2', url: 'minecraft1.5.2' },
     { name: 'Moto X3M 2', url: 'motox3m2' },
     { name: 'OvO', url: 'ovo' },
+    { name: 'OVERSTEER', url: 'oversteer' },
     { name: 'Pac-Man', url: 'pacman' },
     { name: 'Polytrack', url: 'polytrack' },
     { name: 'Pushback', url: 'pushback' },

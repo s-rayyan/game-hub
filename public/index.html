@@ -25,11 +25,23 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
-
-  
 </head>
 
 <body data-bs-theme="dark">
+  <!-- Announcement Banner -->
+  <div id="promo-banner" class="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white px-4 py-3 shadow-lg relative flex items-center justify-between transition-all duration-300">
+    <div class="flex items-center justify-center w-full gap-3 text-sm md:text-base font-semibold">
+      <span class="bg-white/20 text-white text-xs px-2 py-1 rounded-full uppercase tracking-wider">New</span>
+      <span>Check out my new game, <strong>Oversteer</strong>!</span>
+      <a href="https://overs-16336.web.app/" class="bg-white text-purple-900 hover:bg-gray-100 px-4 py-1.5 rounded-full text-xs md:text-sm font-bold shadow transition hover:scale-105 active:scale-95">
+        Play Now &rarr;
+      </a>
+    </div>
+    <button onclick="document.getElementById('promo-banner').style.display='none'" class="text-white/80 hover:text-white text-xl font-bold px-2 focus:outline-none" aria-label="Close banner">
+      &times;
+    </button>
+  </div>
+
   <div class="main px-8 py-10 flex flex-col gap-8">
     <div class="header flex flex-col items-center gap-6">
       <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
@@ -55,11 +67,7 @@
     <div id="game-links" class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-start"></div>
   </div>
 
-
-
-
   <script src="script.mjs" type="module"></script>
 </body>
-
 
 </html>
