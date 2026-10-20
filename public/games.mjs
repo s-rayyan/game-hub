@@ -138,7 +138,7 @@ export const games = [
     { name: 'Exo', url: 'exo' },
     { name: 'Factory Balls', url: 'factoryballs' },
     { name: 'Factory Balls Forever', url: 'factoryballsforever' },
-    { name: 'Pokemon Fire Red', url: 'fire-red' },
+    { name: 'Pokemon Fire Red', url: 'pokemon' },
     { name: 'Fake Virus', url: 'fake-virus' },
     { name: 'Fancy Pants Adventures', url: 'fancypantsadventures' },
     { name: 'Farm Match', url: 'farm-match' },
