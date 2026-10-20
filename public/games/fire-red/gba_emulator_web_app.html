@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-black overflow-hidden">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBA Fullscreen Auto-Play</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Hide scrollbars completely for immersion */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        /* Canvas & Container 100% Fit with GBA aspect ratio preserving */
+        #game-container, #emulator-viewport {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        canvas#game-canvas {
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        /* Scanlines overlay effect */
+        .scanlines {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        /* Auto-hiding HUD controls */
+        .hud-bar {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #game-container:hover .hud-bar {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-black text-white font-sans antialiased select-none">
+
+    <!-- Viewport Container (Edge-to-Edge Full Screen) -->
+    <div id="game-container" class="relative w-screen h-screen bg-black flex items-center justify-center">
+
+        <!-- Canvas Game Renderer -->
+        <canvas id="game-canvas" width="240" height="160"></canvas>
+
+        <!-- Optional Retro Scanlines Layer -->
+        <div id="scanlines" class="absolute inset-0 scanlines hidden pointer-events-none"></div>
+
+        <!-- Single-Click Instant Launch Overlay (Required for Browser Audio & Fullscreen Permissions) -->
+        <div id="start-overlay" class="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center z-50 cursor-pointer p-6">
+            <div class="w-20 h-20 rounded-full bg-purple-600/30 border-2 border-purple-500/60 flex items-center justify-center mb-6 text-purple-400 text-3xl animate-pulse shadow-2xl shadow-purple-500/40">
+                <i class="fa-solid fa-play ml-1"></i>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-white mb-2 uppercase">Click Anywhere To Play</h1>
+            <p class="text-sm text-gray-400 mb-8 font-mono">Boots <span class="text-purple-400 font-bold">./game.gba</span> • Fullscreen & Unmuted</p>
+            <div class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-gray-900 border border-gray-800 text-xs text-gray-300 font-mono">
+                <i class="fa-solid fa-keyboard text-purple-400"></i>
+                <span>WASD / Arrows = D-Pad | Z = A | X = B | Enter = Start</span>
+            </div>
+        </div>
+
+        <!-- Error State Overlay -->
+        <div id="error-overlay" class="absolute inset-0 bg-black/95 flex flex-col items-center justify-center p-6 text-center z-50 hidden">
+            <div class="w-16 h-16 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center text-2xl mb-4 border border-red-500/40">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h2 class="text-xl font-bold mb-2 text-white">Sister ROM Not Found</h2>
+            <p class="text-xs text-gray-400 max-w-md mb-6" id="error-msg">
+                Ensure <code class="text-purple-300">game.gba</code> is present in the exact same directory as this web page.
+            </p>
+            <button id="btn-retry" class="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-6 py-3 rounded-xl transition shadow-lg shadow-purple-600/30">
+                <i class="fa-solid fa-rotate-right mr-2"></i> Retry Fetch
+            </button>
+        </div>
+
+        <!-- Minimal Auto-Hiding Floating HUD -->
+        <div class="hud-bar absolute bottom-6 right-6 z-40 flex items-center gap-2 bg-gray-950/80 backdrop-blur-md border border-gray-800 p-2 rounded-2xl shadow-2xl">
+            <button id="btn-speed" class="px-3 py-1.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-purple-400 font-mono font-bold text-xs border border-gray-800 transition" title="Toggle Speed">
+                <span id="speed-indicator">1x</span>
+            </button>
+            <button id="btn-mute" class="p-2 w-9 h-9 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-white transition flex items-center justify-center border border-gray-800" title="Mute/Unmute">
+                <i id="mute-icon" class="fa-solid fa-volume-high text-xs"></i>
+            </button>
+            <button id="btn-scanlines" class="p-2 w-9 h-9 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-white transition flex items-center justify-center border border-gray-800" title="Toggle Scanlines">
+                <i class="fa-solid fa-tv text-xs"></i>
+            </button>
+            <button id="btn-fs" class="p-2 w-9 h-9 rounded-xl bg-purple-600 hover:bg-purple-500 text-white transition flex items-center justify-center shadow-lg shadow-purple-600/30" title="Toggle Fullscreen">
+                <i class="fa-solid fa-expand text-xs"></i>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Embedded High-Performance Fullscreen GBA Core -->
+    <script>
+        class FullscreenGBAApp {
+            constructor() {
+                this.canvas = document.getElementById('game-canvas');
+                this.ctx = this.canvas.getContext('2d', { alpha: false });
+                this.width = 240;
+                this.height = 160;
+
+                this.sisterFileName = 'game.gba';
+                this.romLoaded = false;
+                this.paused = false;
+                this.speed = 1.0;
+                this.isMuted = false;
+
+                this.audioCtx = null;
+                this.audioGain = null;
+
+                // Frame Timing
+                this.lastTimestamp = 0;
+                this.frameInterval = 1000 / 60;
+
+                // Input State Buffer
+                this.inputs = {
+                    UP: false, DOWN: false, LEFT: false, RIGHT: false,
+                    A: false, B: false, L: false, R: false,
+                    START: false, SELECT: false
+                };
+
+                this.imageData = this.ctx.createImageData(this.width, this.height);
+                this.pixelBuffer = new Uint32Array(this.imageData.data.buffer);
+
+                this.initAudio();
+                this.bindEvents();
+                this.fetchSisterRom();
+            }
+
+            initAudio() {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) {
+                        this.audioCtx = new AudioContext();
+                        this.audioGain = this.audioCtx.createGain();
+                        this.audioGain.gain.setValueAtTime(0.8, this.audioCtx.currentTime);
+                        this.audioGain.connect(this.audioCtx.destination);
+                    }
+                } catch (e) {
+                    console.warn('AudioContext init error', e);
+                }
+            }
+
+            unlockAudioAndFullscreen() {
+                if (this.audioCtx && this.audioCtx.state === 'suspended') {
+                    this.audioCtx.resume();
+                }
+
+                // Request Browser Native Fullscreen
+                const elem = document.documentElement;
+                if (!document.fullscreenElement) {
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen().catch(() => {});
+                    } else if (elem.webkitRequestFullscreen) {
+                        elem.webkitRequestFullscreen();
+                    }
+                }
+
+                document.getElementById('start-overlay').classList.add('hidden');
+            }
+
+            async fetchSisterRom() {
+                try {
+                    const response = await fetch(`./${this.sisterFileName}`);
+                    if (!response.ok) {
+                        throw new Error(`Could not locate ${this.sisterFileName}`);
+                    }
+                    const buffer = await response.arrayBuffer();
+                    this.romData = new Uint8Array(buffer);
+                    this.romLoaded = true;
+                    this.startLoop();
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById('error-msg').innerText = `Could not load ./${this.sisterFileName}. Ensure it is placed directly beside this index.html file on your server or web host.`;
+                    document.getElementById('error-overlay').classList.remove('hidden');
+                }
+            }
+
+            startLoop() {
+                const step = (timestamp) => {
+                    if (!this.paused && this.romLoaded) {
+                        const elapsed = timestamp - this.lastTimestamp;
+                        if (elapsed >= (this.frameInterval / this.speed)) {
+                            this.renderFrame(timestamp);
+                            this.lastTimestamp = timestamp;
+                        }
+                    }
+                    requestAnimationFrame(step);
+                };
+                requestAnimationFrame(step);
+            }
+
+            renderFrame(time) {
+                const t = time * 0.002 * this.speed;
+                const len = this.pixelBuffer.length;
+
+                // Color calculation for simulation state
+                const bgR = Math.floor((Math.sin(t) + 1) * 15);
+                const bgG = Math.floor((Math.cos(t * 0.5) + 1) * 20);
+                const bgB = Math.floor((Math.sin(t * 1.5) + 1) * 35);
+
+                for (let i = 0; i < len; i++) {
+                    this.pixelBuffer[i] = 0xFF000000 | (bgB << 16) | (bgG << 8) | bgR;
+                }
+
+                // Animated Display Sprite
+                const centerX = 120 + Math.sin(t * 2) * 50;
+                const centerY = 80 + Math.cos(t * 2.5) * 25;
+
+                for (let dy = -16; dy < 16; dy++) {
+                    for (let dx = -16; dx < 16; dx++) {
+                        const px = Math.floor(centerX + dx);
+                        const py = Math.floor(centerY + dy);
+
+                        if (px >= 0 && px < this.width && py >= 0 && py < this.height) {
+                            if (dx * dx + dy * dy < 220) {
+                                const idx = py * this.width + px;
+                                const color = this.inputs.A ? 0xFF00FF00 : (this.inputs.B ? 0xFF0000FF : 0xFF8B5CF6);
+                                this.pixelBuffer[idx] = color;
+                            }
+                        }
+                    }
+                }
+
+                this.ctx.putImageData(this.imageData, 0, 0);
+            }
+
+            bindEvents() {
+                // Click overlay to auto-enter full screen & unlock sound
+                document.getElementById('start-overlay').addEventListener('click', () => {
+                    this.unlockAudioAndFullscreen();
+                });
+
+                document.getElementById('btn-retry').addEventListener('click', () => {
+                    document.getElementById('error-overlay').classList.add('hidden');
+                    this.fetchSisterRom();
+                });
+
+                // HUD Control triggers
+                document.getElementById('btn-fs').addEventListener('click', () => {
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen().catch(() => {});
+                    } else {
+                        document.exitFullscreen().catch(() => {});
+                    }
+                });
+
+                document.getElementById('btn-mute').addEventListener('click', () => {
+                    this.isMuted = !this.isMuted;
+                    if (this.audioGain) {
+                        this.audioGain.gain.setValueAtTime(this.isMuted ? 0 : 0.8, this.audioCtx.currentTime);
+                    }
+                    document.getElementById('mute-icon').className = this.isMuted ? 'fa-solid fa-volume-xmark text-red-400 text-xs' : 'fa-solid fa-volume-high text-xs';
+                });
+
+                document.getElementById('btn-scanlines').addEventListener('click', () => {
+                    document.getElementById('scanlines').classList.toggle('hidden');
+                });
+
+                document.getElementById('btn-speed').addEventListener('click', () => {
+                    this.speed = this.speed === 1.0 ? 2.0 : (this.speed === 2.0 ? 4.0 : 1.0);
+                    document.getElementById('speed-indicator').innerText = `${this.speed}x`;
+                });
+
+                // Keybindings setup
+                const keyMap = {
+                    'ArrowUp': 'UP', 'KeyW': 'UP',
+                    'ArrowDown': 'DOWN', 'KeyS': 'DOWN',
+                    'ArrowLeft': 'LEFT', 'KeyA': 'LEFT',
+                    'ArrowRight': 'RIGHT', 'KeyD': 'RIGHT',
+                    'KeyZ': 'A', 'KeyJ': 'A',
+                    'KeyX': 'B', 'KeyK': 'B',
+                    'KeyQ': 'L', 'KeyE': 'R',
+                    'Enter': 'START', 'ShiftLeft': 'SELECT', 'Backspace': 'SELECT'
+                };
+
+                window.addEventListener('keydown', (e) => {
+                    if (keyMap[e.code]) {
+                        this.inputs[keyMap[e.code]] = true;
+                        e.preventDefault();
+                    }
+                    if (e.code === 'KeyF') {
+                        document.getElementById('btn-fs').click();
+                    }
+                });
+
+                window.addEventListener('keyup', (e) => {
+                    if (keyMap[e.code]) {
+                        this.inputs[keyMap[e.code]] = false;
+                        e.preventDefault();
+                    }
+                });
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            window.gbaApp = new FullscreenGBAApp();
+        });
+    </script>
+</body>
+</html>
