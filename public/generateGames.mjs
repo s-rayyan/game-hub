@@ -25,7 +25,7 @@ export function generateGameLinks(fadeIn = true) {
             clickTimer && clearTimeout(clickTimer);
             clickTimer = setTimeout(() => {
                 trackGameClick(game.name);
-                window.open(`games/${game.url}`);
+                window.open(`games/${game.url}/`);
             }, 300);
         });
 
