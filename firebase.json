@@ -5,12 +5,22 @@
     "location": "us-west1",
     "rules": "firestore.rules"
   },
-  "hosting": {
+  "hosting": [{
+    "site": "gamehub-7b1e2",
     "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ]
-  }
+  },
+  {
+    "site": "rayyan-gamehub",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }]
 }
