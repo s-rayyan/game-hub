@@ -185,6 +185,7 @@ export const games = [
     { name: 'Guess Kitty', url: 'guess-kitty' },
     { name: 'Gura Temberine', url: 'gura-temberine' },
     { name: 'Hackertype', url: 'hackertype' },
+    { name: 'Hollow Knight', url: 'hollowknight' },
     { name: 'Handshakes', url: 'handshakes' },
     { name: 'Hanger', url: 'hanger' },
     { name: 'Happy Hop', url: 'happy-hop' },
