@@ -217,6 +217,7 @@ export const games = [
     { name: 'Kitten Cannon', url: 'kittencannon' },
     { name: 'Knife Master', url: 'knife-master' },
     { name: 'Konnekt', url: 'konnekt' },
+    { name: 'Smash Karts', url: 'smashkarts' },
     { name: 'Learn to Fly', url: 'learntofly' },
     { name: 'Learn to Fly 2', url: 'learntofly2' },
     { name: 'Little Alchemy 2', url: 'little-alchemy-2' },
