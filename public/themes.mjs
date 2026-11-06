@@ -22,7 +22,7 @@ export function initThemeSwitcher() {
     });
 }
 
-function applyTheme(theme) {
+export function applyTheme(theme) {
     const $themeStylesheet = $('#theme-stylesheet');
     const $themeToggle = $('#theme-toggle');
 

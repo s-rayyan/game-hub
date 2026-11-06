@@ -123,3 +123,219 @@ body,
 .custom-range {
     cursor: pointer;
 }
+
+/* Optional Google account: button, panel and first-sync dialog.
+   The button reuses .theme-toggle-btn so it picks up each theme's look; everything else is a
+   neutral dark card that reads fine on all four themes. */
+.account-btn {
+    right: auto;
+    left: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: none;
+    max-width: calc(100vw - 180px);
+}
+
+/* Own colors (two-class selector so it beats each theme's .theme-toggle-btn): the account button
+   sits over the promo banner, and some themes' toggle colors are unreadable there. */
+.theme-toggle-btn.account-btn {
+    background: rgba(15, 20, 32, 0.88);
+    color: #e5e7eb;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+}
+
+.theme-toggle-btn.account-btn:hover:not(:disabled) {
+    background: rgba(30, 40, 62, 0.95);
+}
+
+.account-btn:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+.account-g {
+    width: 18px;
+    height: 18px;
+    flex: none;
+}
+
+.account-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    flex: none;
+}
+
+.account-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.account-panel,
+.account-msg,
+.account-modal {
+    background: rgba(15, 20, 32, 0.96);
+    color: #e5e7eb;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.account-panel[hidden],
+.account-msg[hidden] {
+    display: none;
+}
+
+.account-panel {
+    position: fixed;
+    top: 84px;
+    left: 32px;
+    z-index: 101;
+    width: min(300px, calc(100vw - 32px));
+    padding: 16px;
+}
+
+.account-name {
+    font-weight: 700;
+}
+
+.account-email {
+    color: #9ca3af;
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+}
+
+.account-sync {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.account-dot {
+    width: 9px;
+    height: 9px;
+    margin-top: 5px;
+    border-radius: 50%;
+    flex: none;
+    background: #6b7280;
+}
+
+.account-dot.synced { background: #34d399; }
+.account-dot.syncing { background: #60a5fa; }
+.account-dot.paused,
+.account-dot.error { background: #f59e0b; }
+
+.account-note {
+    margin: 8px 0 0;
+    color: #9ca3af;
+    font-size: 0.8rem;
+}
+
+.account-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.account-action {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.account-action:hover:not(:disabled) { background: rgba(255, 255, 255, 0.14); }
+.account-action:disabled { opacity: 0.5; cursor: progress; }
+
+.account-msg {
+    position: fixed;
+    top: 84px;
+    left: 32px;
+    z-index: 101;
+    max-width: min(320px, calc(100vw - 32px));
+    padding: 12px 14px;
+}
+
+.account-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.account-modal {
+    width: min(420px, 100%);
+    padding: 22px;
+}
+
+.account-modal h2 {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.account-modal p {
+    margin: 0 0 16px;
+    color: #cbd5e1;
+}
+
+.account-modal .account-action {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px 14px;
+    text-align: left;
+}
+
+.account-modal .account-action strong,
+.account-modal .account-action span {
+    display: block;
+}
+
+.account-modal .account-action span {
+    margin-top: 2px;
+    color: #9ca3af;
+    font-size: 0.8rem;
+}
+
+.account-modal .account-action.primary {
+    border-color: #60a5fa;
+    background: rgba(96, 165, 250, 0.15);
+}
+
+.account-link {
+    display: block;
+    margin: 14px auto 0;
+    padding: 4px 8px;
+    border: 0;
+    background: none;
+    color: #9ca3af;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+@media (max-width: 640px) {
+    .account-btn { left: 16px; top: 16px; }
+    .account-btn .account-label { display: none; }
+    .account-panel,
+    .account-msg { left: 16px; top: 68px; }
+}

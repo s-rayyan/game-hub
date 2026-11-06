@@ -2,6 +2,23 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Cloud saves: one document per localStorage key, readable and writable only by their owner.
+      // The page only ever writes here for users signed in with Google.
+      match /saves/{saveId} {
+        allow read, delete: if request.auth != null && request.auth.uid == userId;
+
+        allow create, update: if request.auth != null
+          && request.auth.uid == userId
+          && request.resource.data.keys().hasOnly(['k', 'v', 'd', 'st'])
+          && request.resource.data.k is string
+          && request.resource.data.k.size() > 0
+          && request.resource.data.k.size() <= 1000
+          && request.resource.data.v is string
+          && request.resource.data.v.size() <= 600000
+          && request.resource.data.d is bool
+          && request.resource.data.st == request.time;
+      }
     }
   }
 }
