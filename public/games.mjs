@@ -70,6 +70,7 @@ export const games = [
     { name: 'Breaking The Bank', url: 'breakingthebank' },
     { name: 'BreakLock', url: 'breaklock' },
     { name: 'Breakout', url: 'breakout' },
+    { name: 'Brotato', url: 'brotato' },
     { name: 'BTTS', url: 'btts' },
     { name: 'Bubble Pop', url: 'bubble-pop' },
     { name: 'Burrito Bison', url: 'burrito-bison' },
